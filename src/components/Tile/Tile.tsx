@@ -1,3 +1,4 @@
+import React from "react";
 import "./Tile.css";
 
 interface Props {
