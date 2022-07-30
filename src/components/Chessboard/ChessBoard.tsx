@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import Tile from "../Tile/Tile";
 import "./Chessboard.css";
 
@@ -34,6 +34,59 @@ for (let i = 0; i < horizontalAxis.length; i++) {
 }
 
 export default function ChessBoard() {
+  const chessboardRef = useRef<HTMLDivElement>(null);
+
+  function grabPiece(e: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    const element = e.target as HTMLElement;
+    if (element.classList.contains("chess-piece")) {
+      console.log(element);
+
+      const x = e.clientX - 35;
+      const y = e.clientY - 35;
+      element.style.position = "absolute";
+      element.style.left = `${x}px`;
+      element.style.top = `${y}px`;
+
+      activePiece = element;
+    }
+  }
+
+  let activePiece: HTMLElement | null = null;
+
+  function movePiece(e: React.MouseEvent) {
+    const chessboard = chessboardRef.current;
+    if (activePiece && chessboard) {
+      const minX = chessboard.offsetLeft - 15;
+      const minY = chessboard.offsetTop - 5;
+      const maxX = chessboard.offsetLeft + chessboard.clientWidth - 55;
+      const maxY = chessboard.offsetTop + chessboard.clientHeight - 60;
+      const x = e.clientX - 35;
+      const y = e.clientY - 35;
+
+      if (x < minX) {
+        activePiece.style.left = `${minX}px`;
+      } else if (x > maxX) {
+        activePiece.style.left = `${maxX}px`;
+      } else {
+        activePiece.style.left = `${x}px`;
+      }
+
+      if (y < minY) {
+        activePiece.style.top = `${minY}px`;
+      } else if (y > maxY) {
+        activePiece.style.top = `${maxY}px`;
+      } else {
+        activePiece.style.top = `${y}px`;
+      }
+    }
+  }
+
+  function dropPiece(e: React.MouseEvent) {
+    if (activePiece) {
+      activePiece = null;
+    }
+  }
+
   let board = [];
 
   for (let j = verticalAxis.length - 1; j >= 0; j--) {
@@ -48,8 +101,18 @@ export default function ChessBoard() {
       });
 
       //if there is no piece there, just render the tile without a piece on it:
-      board.push(<Tile image={image} number={i + j} />);
+      board.push(<Tile key={`${j},${i}`} image={image} number={i + j} />);
     }
   }
-  return <div id="chessboard">{board}</div>;
+  return (
+    <div
+      onMouseMove={(e) => movePiece(e)}
+      onMouseDown={(e) => grabPiece(e)}
+      onMouseUp={(e) => dropPiece(e)}
+      id="chessboard"
+      ref={chessboardRef}
+    >
+      {board}
+    </div>
+  );
 }
