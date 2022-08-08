@@ -90,6 +90,7 @@ export default function ChessBoard() {
   function dropPiece(e: React.MouseEvent) {
     const cBoard = chessboardRef.current;
     if (activePiece && cBoard) {
+      //setting the piece in reference to the board including size of board and size of board tiles.
       const x = Math.floor((e.clientX - cBoard.offsetLeft) / 80);
       const y = Math.abs(Math.ceil((e.clientY - cBoard.offsetTop - 640) / 80));
 
